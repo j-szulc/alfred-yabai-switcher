@@ -1,5 +1,4 @@
 use std::collections::BTreeMap as Map;
-use std::fmt::format;
 use std::process::Output;
 use serde::{Deserialize, Serialize};
 extern crate alfred;
@@ -8,7 +7,6 @@ use std::io;
 #[derive(Debug, Deserialize)]
 struct YabaiWindow{
     id: u32,
-    pid: u32,
     app: String,
     title: String,
 }
