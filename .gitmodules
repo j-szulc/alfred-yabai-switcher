@@ -1,0 +1,3 @@
+[submodule "alfredworkflow/static/alfred-browser-tabs"]
+	path = alfredworkflow/static/alfred-browser-tabs
+	url = https://github.com/epilande/alfred-browser-tabs.git
