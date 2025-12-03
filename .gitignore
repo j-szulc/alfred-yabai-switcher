@@ -133,7 +133,8 @@ fabric.properties
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -512,3 +513,4 @@ pip-selfcheck.json
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,jetbrains+all,dotenv,venv,node,python,rust,c++,visualstudiocode
+.idea
