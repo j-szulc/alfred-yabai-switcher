@@ -1,6 +1,11 @@
+mod app_paths;
+mod cache;
+mod error;
+
+use crate::app_paths::get_app_path;
 use anyhow::{Context, Result};
 use log::error;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::collections::BTreeMap as Map;
 use std::fmt::format;
 use std::io;
@@ -14,21 +19,6 @@ struct YabaiWindow {
     id: u32,
     app: String,
     title: String,
-}
-
-fn get_app_path(app: &str) -> std::io::Result<String> {
-    std::process::Command::new("osascript")
-        .arg("-e")
-        .arg(format!(
-            "tell application \"System Events\" to POSIX path of (file of process \"{}\" as alias)",
-            app
-        ))
-        .stdout(std::process::Stdio::piped())
-        .output()
-        .and_then(|output: Output| {
-            let output = String::from_utf8(output.stdout).unwrap();
-            Ok(output.trim().to_string())
-        })
 }
 
 fn main() -> Result<()> {
@@ -55,11 +45,14 @@ fn main() -> Result<()> {
             error!("Failed to parse yabai output as JSON: {}", err);
         })?;
 
+    let mut get_app_path = cache::Cache::new(get_app_path, "/tmp/app_paths.db");
+
     let windows_items: Vec<alfred::Item> = windows
         .iter()
         .filter_map(|window| {
-            get_app_path(&window.app)
-                .inspect_err(|err| error!("Failed to get app path for {}: {}", window.app, err))
+            get_app_path
+                .call(&window.app)
+                .inspect_err(|err| error!("Failed to get app path for {}: {:?}", window.app, err))
                 .map(|path| (window, path))
                 .ok()
         })
