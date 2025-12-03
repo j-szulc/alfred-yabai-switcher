@@ -14,5 +14,5 @@ pub fn get_app_path(app: &str) -> Result<String> {
     let output = String::from_utf8(output.stdout)
         .map_err(|e| anyhow::anyhow!("Failed to parse osascript output: {}", e))?;
 
-    Ok(output)
+    Ok(output.trim().to_string())
 }

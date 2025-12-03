@@ -16,9 +16,7 @@ struct YabaiWindow {
     title: String,
 }
 
-fn main() -> Result<()> {
-    env_logger::init();
-
+fn _main() -> Result<()> {
     let yabai_bin = which("yabai").context("Executable 'yabai' not found in PATH")?;
 
     let output = std::process::Command::new(yabai_bin)
@@ -49,11 +47,11 @@ fn main() -> Result<()> {
                 .map(|path| (window, path))
         })
         .map(|(window, path)| {
-            let title = format!("{} - {}", window.app, window.title);
+            let title = format!("{} - {}", window.app.trim(), window.title.trim());
             let arg = format!("{}", window.id);
             alfred::ItemBuilder::new(title.clone())
                 .uid(title)
-                .subtitle(&window.app)
+                .subtitle(window.app.trim())
                 .icon_file(path)
                 .arg(arg)
                 .into_item()
@@ -64,4 +62,14 @@ fn main() -> Result<()> {
         .context("Failed to write alfred items to stdout")?;
 
     Ok(())
+}
+
+fn main() {
+    env_logger::init();
+
+    if let Err(e) = _main() {
+        error!("{}", e);
+        eprintln!("{}", e);
+        std::process::exit(1);
+    }
 }
