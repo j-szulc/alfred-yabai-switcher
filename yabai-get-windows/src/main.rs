@@ -3,7 +3,7 @@ mod cache;
 mod utils;
 
 use anyhow::{Context, Result};
-use log::error;
+use log::{debug, error};
 use serde::Deserialize;
 use std::{
     borrow::Cow,
@@ -25,17 +25,27 @@ struct YabaiWindow {
     title: String,
 }
 
-macro_rules! timeit {
+macro_rules! _timeit {
     ($expr:expr, $label:literal) => {{
         let start = std::time::Instant::now();
         let result = $expr;
         let end = std::time::Instant::now();
-        eprintln!(
-            "Time taken for {}: {}",
+        debug!(
+            "Time taken by {:?}: {}",
             $label,
             humantime::format_duration(end.duration_since(start))
         );
         result
+    }};
+}
+
+macro_rules! timeit {
+    ($expr:expr, $label:literal) => {{
+        if log::log_enabled!(log::Level::Debug) {
+            _timeit!($expr, $label)
+        } else {
+            $expr
+        }
     }};
 }
 
