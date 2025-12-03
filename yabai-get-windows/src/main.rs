@@ -72,7 +72,7 @@ fn _main() -> Result<()> {
         "parse yabai output as JSON"
     );
 
-    let mut cache: Cache<Cow<'_, str>, String> = Cache::new(PathBuf::from(CACHE_FILE))?;
+    let mut cache: Cache<Cow<'_, str>, String> = Cache::new(&PathBuf::from(CACHE_FILE))?;
 
     let windows_items: Vec<alfred::Item> = timeit!(
         windows

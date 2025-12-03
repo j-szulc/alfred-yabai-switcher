@@ -6,12 +6,11 @@ use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::collections::hash_map::Entry;
 use std::collections::hash_map::Entry::{Occupied, Vacant};
-use std::collections::hash_map::OccupiedEntry;
 use std::collections::HashMap;
 use std::fs;
 use std::fs::{File, OpenOptions};
 use std::hash::Hash;
-use std::path::PathBuf;
+use std::path::Path;
 use trait_set::trait_set;
 
 trait_set! {
@@ -20,13 +19,12 @@ trait_set! {
 }
 
 pub struct Cache<K: CacheKey, V: CacheValue> {
-    path: PathBuf,
     file: File,
     pub map: HashMap<K, V>, // TODO: do it properly
 }
 
 impl<K: CacheKey, V: CacheValue> Cache<K, V> {
-    pub fn new(path: PathBuf) -> Result<Self> {
+    pub fn new(path: &Path) -> Result<Self> {
         let file = OpenOptions::new()
             .create(true)
             .read(true)
@@ -40,24 +38,9 @@ impl<K: CacheKey, V: CacheValue> Cache<K, V> {
         } else {
             serde_json::from_str(&contents).context("Failed to parse cache file")?
         };
-        Ok(Self { path, file, map })
+        Ok(Self { file, map })
     }
 
-    // pub fn filled(
-    //     mut self,
-    //     keys: impl IntoIterator<Item = K>,
-    //     filling_function: impl Fn(&K) -> Result<V>,
-    //     callback: impl Fn(Result<OccupiedEntry<K, V>>),
-    // ) {
-    //     for key in keys {
-    //         callback(match self.app_to_path.entry(key) {
-    //             Occupied(entry) => Ok(entry),
-    //             Vacant(entry) => {
-    //                 filling_function(&entry.key()).and_then(|value| Ok(entry.insert_entry(value)))
-    //             }
-    //         });
-    //     }
-    // }
     pub fn get_or_insert_with<'a>(
         &'a mut self,
         key: K,
@@ -75,10 +58,6 @@ impl<K: CacheKey, V: CacheValue> Cache<K, V> {
             self.file.sync_all().context("Failed to sync cache file")?;
         }
         Ok(())
-    }
-
-    pub fn flush(&self) -> Result<()> {
-        self._flush(true)
     }
 }
 
