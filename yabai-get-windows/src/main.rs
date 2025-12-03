@@ -1,6 +1,5 @@
 mod app_paths;
 mod cache;
-mod utils;
 
 use anyhow::{Context, Result};
 use log::{debug, error};
