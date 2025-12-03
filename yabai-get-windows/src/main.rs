@@ -1,5 +1,4 @@
 mod app_paths;
-mod cache;
 mod error;
 
 use crate::app_paths::get_app_path;
@@ -45,16 +44,13 @@ fn main() -> Result<()> {
             error!("Failed to parse yabai output as JSON: {}", err);
         })?;
 
-    let mut get_app_path = cache::Cache::new(get_app_path, "/tmp/app_paths.db");
-
     let windows_items: Vec<alfred::Item> = windows
         .iter()
         .filter_map(|window| {
-            get_app_path
-                .call(&window.app)
+            get_app_path(&window.app)
                 .inspect_err(|err| error!("Failed to get app path for {}: {:?}", window.app, err))
-                .map(|path| (window, path))
                 .ok()
+                .map(|path| (window, path))
         })
         .map(|(window, path)| {
             let title = format!("{} - {}", window.app, window.title);

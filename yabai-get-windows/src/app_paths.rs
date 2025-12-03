@@ -1,15 +1,6 @@
-use anyhow::{Context, Result};
-use serde::{Deserialize, Serialize};
+use anyhow::Result;
 
-use crate::cache::ShouldCache;
-
-#[derive(Serialize, Deserialize, Debug)]
-pub enum GetAppPathError {
-    ExecutionFailed(String),
-    ParsingFailed(String),
-}
-
-fn _get_app_path(app: &str) -> Result<String, GetAppPathError> {
+pub fn get_app_path(app: &str) -> Result<String> {
     let output = std::process::Command::new("osascript")
         .arg("-e")
         .arg(format!(
@@ -18,17 +9,10 @@ fn _get_app_path(app: &str) -> Result<String, GetAppPathError> {
         ))
         .stdout(std::process::Stdio::piped())
         .output()
-        .map_err(|e| GetAppPathError::ExecutionFailed(e.to_string()))?;
+        .map_err(|e| anyhow::anyhow!("Failed to execute osascript: {}", e))?;
 
     let output = String::from_utf8(output.stdout)
-        .map_err(|e| GetAppPathError::ParsingFailed(e.to_string()))?;
+        .map_err(|e| anyhow::anyhow!("Failed to parse osascript output: {}", e))?;
 
     Ok(output)
-}
-
-pub fn get_app_path(app: &str) -> (ShouldCache, Result<String, GetAppPathError>) {
-    match _get_app_path(app) {
-        Ok(path) => (ShouldCache::Yes, Ok(path)),
-        Err(e) => (ShouldCache::No, Err(e)),
-    }
 }
