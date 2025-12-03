@@ -1,14 +1,10 @@
 mod app_paths;
-mod error;
 
 use crate::app_paths::get_app_path;
 use anyhow::{Context, Result};
 use log::error;
 use serde::Deserialize;
-use std::collections::BTreeMap as Map;
-use std::fmt::format;
 use std::io;
-use std::process::Output;
 use which::which;
 
 extern crate alfred;
