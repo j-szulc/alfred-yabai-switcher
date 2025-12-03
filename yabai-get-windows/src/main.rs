@@ -12,15 +12,8 @@ extern crate alfred;
 #[derive(Debug, Deserialize)]
 struct YabaiWindow {
     id: u32,
-    #[allow(dead_code)]
-    pid: u32,
     app: String,
     title: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct AppLocationPathCache {
-    entries: Map<String, String>,
 }
 
 fn get_app_path(app: &str) -> std::io::Result<String> {
