@@ -20,7 +20,7 @@ struct YabaiWindow {
     title: String,
 }
 
-macro_rules! _timeit {
+macro_rules! timeit_ {
     ($expr:expr, $label:literal) => {{
         let start = std::time::Instant::now();
         let result = $expr;
@@ -37,7 +37,7 @@ macro_rules! _timeit {
 macro_rules! timeit {
     ($expr:expr, $label:literal) => {{
         if log::log_enabled!(log::Level::Debug) {
-            _timeit!($expr, $label)
+            timeit_!($expr, $label)
         } else {
             $expr
         }
