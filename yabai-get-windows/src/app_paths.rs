@@ -1,11 +1,6 @@
 use anyhow::{Context, Result};
-use log::error;
-use serde::{Deserialize, Serialize};
-use std::borrow::Cow;
-use std::collections::hash_map::Entry::{self, Occupied, Vacant};
-use std::fs;
 use std::process::Command;
-use std::{collections::HashMap, process::Stdio};
+use std::process::Stdio;
 
 pub fn get_app_path(app: &str) -> Result<String> {
     let output = Command::new("osascript")

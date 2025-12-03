@@ -7,7 +7,7 @@ use serde::Deserialize;
 use std::{
     borrow::Cow,
     io,
-    path::{Path, PathBuf},
+    path::PathBuf,
 };
 use which::which;
 

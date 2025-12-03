@@ -1,10 +1,7 @@
 use anyhow::Context;
 use anyhow::Result;
 use log::error;
-use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use std::borrow::Cow;
-use std::collections::hash_map::Entry;
 use std::collections::hash_map::Entry::{Occupied, Vacant};
 use std::collections::HashMap;
 use std::fs;
@@ -29,10 +26,10 @@ impl<K: CacheKey, V: CacheValue> Cache<K, V> {
             .create(true)
             .read(true)
             .write(true)
-            .open(&path)
+            .open(path)
             .context("Failed to open cache file")?;
 
-        let contents = fs::read_to_string(&path).context("Failed to read cache file")?;
+        let contents = fs::read_to_string(path).context("Failed to read cache file")?;
         let map = if contents.is_empty() {
             HashMap::new()
         } else {
@@ -41,13 +38,13 @@ impl<K: CacheKey, V: CacheValue> Cache<K, V> {
         Ok(Self { file, map })
     }
 
-    pub fn get_or_insert_with<'a>(
-        &'a mut self,
+    pub fn get_or_insert_with(
+        &mut self,
         key: K,
         f: impl Fn() -> Result<V>,
-    ) -> Result<&'a mut V> {
+    ) -> Result<&mut V> {
         match self.map.entry(key) {
-            Vacant(entry) => f().and_then(|value| Ok(entry.insert(value))),
+            Vacant(entry) => f().map(|value| entry.insert(value)),
             Occupied(entry) => Ok(entry.into_mut()),
         }
     }
