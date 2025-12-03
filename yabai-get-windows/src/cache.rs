@@ -24,8 +24,9 @@ impl<K: CacheKey, V: CacheValue> Cache<K, V> {
     pub fn new(path: &Path) -> Result<Self> {
         let file = OpenOptions::new()
             .create(true)
-            .read(true)
             .write(true)
+            .truncate(true) // Cache will be re-written with both old and new data for simplicity
+            .read(true)
             .open(path)
             .context("Failed to open cache file")?;
 
@@ -38,11 +39,7 @@ impl<K: CacheKey, V: CacheValue> Cache<K, V> {
         Ok(Self { file, map })
     }
 
-    pub fn get_or_insert_with(
-        &mut self,
-        key: K,
-        f: impl Fn() -> Result<V>,
-    ) -> Result<&mut V> {
+    pub fn get_or_insert_with(&mut self, key: K, f: impl Fn() -> Result<V>) -> Result<&mut V> {
         match self.map.entry(key) {
             Vacant(entry) => f().map(|value| entry.insert(value)),
             Occupied(entry) => Ok(entry.into_mut()),
