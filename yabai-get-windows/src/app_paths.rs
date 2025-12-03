@@ -1,18 +1,25 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
+use log::error;
+use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
+use std::collections::hash_map::Entry::{self, Occupied, Vacant};
+use std::fs;
+use std::process::Command;
+use std::{collections::HashMap, process::Stdio};
 
 pub fn get_app_path(app: &str) -> Result<String> {
-    let output = std::process::Command::new("osascript")
+    let output = Command::new("osascript")
         .arg("-e")
         .arg(format!(
             "tell application \"System Events\" to POSIX path of (file of process \"{}\" as alias)",
             app
         ))
-        .stdout(std::process::Stdio::piped())
+        .stdin(Stdio::null())
         .output()
-        .map_err(|e| anyhow::anyhow!("Failed to execute osascript: {}", e))?;
+        .context("Failed to execute osascript")?;
 
-    let output = String::from_utf8(output.stdout)
-        .map_err(|e| anyhow::anyhow!("Failed to parse osascript output: {}", e))?;
+    let output =
+        String::from_utf8(output.stdout).context("Failed to parse osascript output as UTF-8")?;
 
     Ok(output.trim().to_string())
 }

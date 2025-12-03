@@ -13,6 +13,11 @@ which = "8.0.0"
 anyhow = "1.0.100"
 log = "0.4.29"
 env_logger = "0.11.8"
+serde_with = "3.16.1"
+trait-set = "0.3.0"
+either = "1.15.0"
+timeit = "0.1.2"
+humantime = "2.3.0"
 
 [profile.release]
 opt-level = 3
