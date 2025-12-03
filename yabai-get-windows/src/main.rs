@@ -60,10 +60,10 @@ fn main() -> Result<()> {
             let title = format!("{} - {}", window.app, window.title);
             let arg = format!("{}", window.id);
             alfred::ItemBuilder::new(title.clone())
-                .uid(title.clone())
+                .uid(title)
                 .subtitle(&window.app)
-                .icon_file(path.clone())
-                .arg(arg.clone())
+                .icon_file(path)
+                .arg(arg)
                 .into_item()
         })
         .collect();
