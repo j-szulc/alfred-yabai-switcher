@@ -6,8 +6,7 @@ pub fn get_app_path(app: &str) -> Result<String> {
     let output = Command::new("osascript")
         .arg("-e")
         .arg(format!(
-            "tell application \"System Events\" to POSIX path of (file of process \"{}\" as alias)",
-            app
+            "tell application \"System Events\" to POSIX path of (file of process \"{app}\" as alias)",
         ))
         .stdin(Stdio::null())
         .output()

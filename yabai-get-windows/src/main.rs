@@ -4,11 +4,7 @@ mod cache;
 use anyhow::{Context, Result};
 use log::{debug, error};
 use serde::Deserialize;
-use std::{
-    borrow::Cow,
-    io,
-    path::PathBuf,
-};
+use std::{borrow::Cow, io, path::PathBuf};
 use which::which;
 
 use crate::{app_paths::get_app_path, cache::Cache};
@@ -48,7 +44,7 @@ macro_rules! timeit {
     }};
 }
 
-fn _main() -> Result<()> {
+fn main_() -> Result<()> {
     let yabai_bin = which("yabai").context("Executable 'yabai' not found in PATH")?;
 
     // TODO: async and timeout
@@ -67,7 +63,7 @@ fn _main() -> Result<()> {
         String::from_utf8(output.stdout)
             .context("Failed to parse yabai output as UTF-8")
             .inspect_err(|err| {
-                error!("Failed to parse yabai output as UTF-8: {}", err);
+                error!("Failed to parse yabai output as UTF-8: {err}");
             })?,
         "parse yabai output"
     );
@@ -76,7 +72,7 @@ fn _main() -> Result<()> {
         serde_json::from_str(&output)
             .context("Failed to parse yabai output as JSON")
             .inspect_err(|err| {
-                error!("Failed to parse yabai output as JSON: {}", err);
+                error!("Failed to parse yabai output as JSON: {err}");
             })?,
         "parse yabai output as JSON"
     );
@@ -90,11 +86,10 @@ fn _main() -> Result<()> {
                 cache
                     .get_or_insert_with(Cow::Borrowed(&window.app), || get_app_path(&window.app))
                     .inspect_err(|err| {
-                        error!("Failed to get app path for {}: {:?}", window.app, err)
+                        error!("Failed to get app path for {}: {err:?}", window.app);
                     })
                     .ok()
-                    .map(|path| (window, path.to_string()))
-                // .inspect(|path| eprintln!("Got app path: {}", path))
+                    .map(|path| (window, (*path).to_string()))
             })
             .map(|(window, path)| {
                 let title = format!("{} - {}", window.app.trim(), window.title.trim());
@@ -121,12 +116,11 @@ fn main() {
         {
             env_logger::init();
 
-            if let Err(e) = _main() {
-                error!("{}", e);
-                eprintln!("{}", e);
+            if let Err(e) = main_() {
+                error!("{e}");
                 std::process::exit(1);
             }
         },
         "main"
-    )
+    );
 }

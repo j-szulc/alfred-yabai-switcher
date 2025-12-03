@@ -46,7 +46,7 @@ impl<K: CacheKey, V: CacheValue> Cache<K, V> {
         }
     }
 
-    fn _flush(&self, fs_sync: bool) -> Result<()> {
+    fn flush_(&self, fs_sync: bool) -> Result<()> {
         serde_json::to_writer(&self.file, &self.map).context("Failed to serialize cache")?;
         if fs_sync {
             self.file.sync_all().context("Failed to sync cache file")?;
@@ -58,8 +58,8 @@ impl<K: CacheKey, V: CacheValue> Cache<K, V> {
 impl<K: CacheKey, V: CacheValue> Drop for Cache<K, V> {
     fn drop(&mut self) {
         // False because dropping the file will flush it anyway
-        if let Err(e) = self._flush(false) {
-            error!("Failed to flush cache: {}", e);
+        if let Err(e) = self.flush_(false) {
+            error!("Failed to flush cache: {e}");
         }
     }
 }
