@@ -2,6 +2,7 @@ mod app_paths;
 mod cache;
 
 use anyhow::{Context, Result};
+use clap::Parser;
 use log::{debug, error};
 use serde::Deserialize;
 use std::{borrow::Cow, io, path::PathBuf};
@@ -44,8 +45,19 @@ macro_rules! timeit {
     }};
 }
 
+#[derive(Parser)]
+struct Args {
+    #[arg(long = "bin", help = "Path to the yabai binary")]
+    yabai_bin: Option<PathBuf>,
+}
+
 fn main_() -> Result<()> {
-    let yabai_bin = which("yabai").context("Executable 'yabai' not found in PATH")?;
+    let args = Args::parse();
+
+    let yabai_bin = match args.yabai_bin {
+        Some(path) => path,
+        None => which("yabai").context("Executable 'yabai' not found in PATH")?,
+    };
 
     // TODO: async and timeout
     let output = timeit!(
