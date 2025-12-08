@@ -51,7 +51,9 @@ struct Args {
     yabai_bin: Option<PathBuf>,
 }
 
-fn main_() -> Result<()> {
+fn main() -> Result<()> {
+    env_logger::init();
+
     let args = Args::parse();
 
     let yabai_bin = match args.yabai_bin {
@@ -112,18 +114,4 @@ fn main_() -> Result<()> {
         .context("Failed to write alfred items to stdout")?;
 
     Ok(())
-}
-
-fn main() {
-    timeit!(
-        {
-            env_logger::init();
-
-            if let Err(e) = main_() {
-                error!("{e}");
-                std::process::exit(1);
-            }
-        },
-        "main"
-    );
 }
