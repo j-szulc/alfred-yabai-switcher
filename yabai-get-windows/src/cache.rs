@@ -30,11 +30,10 @@ impl<K: CacheKey, V: CacheValue> Cache<K, V> {
             .open(path)
             .context("Failed to open cache file")?;
 
-        let contents = fs::read_to_string(path).context("Failed to read cache file")?;
-        let map = if contents.is_empty() {
+        let map = if file.metadata()?.len() == 0 {
             HashMap::new()
         } else {
-            serde_json::from_str(&contents).context("Failed to parse cache file")?
+            serde_json::from_reader(&file).context("Failed to read cache file")?
         };
         Ok(Self { file, map })
     }
