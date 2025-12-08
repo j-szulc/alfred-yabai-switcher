@@ -24,6 +24,7 @@ impl<K: CacheKey, V: CacheValue> Cache<K, V> {
     pub fn new(path: &Path) -> Result<Self> {
         let file = OpenOptions::new()
             .create(true)
+            .truncate(false)
             .write(true)
             .read(true)
             .open(path)
