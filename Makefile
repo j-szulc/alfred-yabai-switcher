@@ -13,4 +13,5 @@ copy-binary:
 		echo "Usage: make copy-binary DEST=path_to_destination"; \
 		exit 1; \
 	fi
+	cd yabai-get-windows && cargo build
 	cp yabai-get-windows/target/debug/yabai-get-windows $$DEST/
