@@ -1,0 +1,1 @@
+- [ ] Parallelize getting app paths (bottleneck when a lot of cache misses)
