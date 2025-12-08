@@ -25,7 +25,6 @@ impl<K: CacheKey, V: CacheValue> Cache<K, V> {
         let file = OpenOptions::new()
             .create(true)
             .write(true)
-            .truncate(true) // Cache will be re-written with both old and new data for simplicity
             .read(true)
             .open(path)
             .context("Failed to open cache file")?;
@@ -47,6 +46,7 @@ impl<K: CacheKey, V: CacheValue> Cache<K, V> {
     }
 
     fn flush_(&self, fs_sync: bool) -> Result<()> {
+        self.file.set_len(0)?;
         serde_json::to_writer(&self.file, &self.map).context("Failed to serialize cache")?;
         if fs_sync {
             self.file.sync_all().context("Failed to sync cache file")?;
