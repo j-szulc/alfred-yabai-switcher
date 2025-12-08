@@ -71,17 +71,8 @@ fn main_() -> Result<()> {
         "yabai query"
     );
 
-    let output = timeit!(
-        String::from_utf8(output.stdout)
-            .context("Failed to parse yabai output as UTF-8")
-            .inspect_err(|err| {
-                error!("Failed to parse yabai output as UTF-8: {err}");
-            })?,
-        "parse yabai output"
-    );
-
     let windows: Vec<YabaiWindow> = timeit!(
-        serde_json::from_str(&output)
+        serde_json::from_slice(&output.stdout)
             .context("Failed to parse yabai output as JSON")
             .inspect_err(|err| {
                 error!("Failed to parse yabai output as JSON: {err}");
