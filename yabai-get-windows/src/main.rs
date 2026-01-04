@@ -3,7 +3,7 @@ mod cache;
 
 use anyhow::{Context, Result};
 use clap::Parser;
-use log::{debug, error};
+use log::{debug, error, info};
 use serde::Deserialize;
 use std::{borrow::Cow, io, path::PathBuf};
 use which::which;
@@ -45,6 +45,21 @@ macro_rules! timeit {
     }};
 }
 
+macro_rules! error_multiline {
+    ($header:expr, $message:expr) => {
+        let message = $message;
+        let message_trimmed = message.trim_ascii();
+        if message_trimmed.is_empty() {
+            error!("{} empty", $header);
+        } else {
+            error!("{}", $header);
+            for line in message_trimmed.lines() {
+                error!("    {}", line.trim());
+            }
+        }
+    };
+}
+
 #[derive(Parser)]
 struct Args {
     #[arg(long = "bin", help = "Path to the yabai binary")]
@@ -75,10 +90,12 @@ fn main() -> Result<()> {
 
     let windows: Vec<YabaiWindow> = timeit!(
         serde_json::from_slice(&output.stdout)
-            .context("Failed to parse yabai output as JSON")
-            .inspect_err(|err| {
-                error!("Failed to parse yabai output as JSON: {err}");
-            })?,
+            .inspect_err(|_| {
+                error_multiline!("Yabai stdout:", String::from_utf8_lossy(&output.stdout));
+                error_multiline!("Yabai stderr:", String::from_utf8_lossy(&output.stderr));
+                info!("Hint: Try running `yabai --stop-service ; yabai --start-service`");
+            })
+            .context("Failed to parse yabai output as JSON")?,
         "parse yabai output as JSON"
     );
 
